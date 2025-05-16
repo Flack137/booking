@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from .models import Room, Booking
+from datetime import date
+from django.db.models import Q
 
 
 def index(request):
@@ -9,7 +11,20 @@ def index(request):
 
 
 def room_list(request):
-    rooms = Room.objects.filter(is_active=True)
+    today = date.today()
+
+    # Получаем комнаты, которые активны
+    active_rooms = Room.objects.filter(is_active=True)
+
+    # Фильтруем комнаты, у которых нет бронирований, пересекающихся с сегодняшним днем
+    busy_rooms = Booking.objects.filter(
+        Q(start_date__lte=today),
+        Q(end_date__gte=today),
+        is_confirmed=True
+    ).values_list('room_id', flat=True)
+
+    # Оставляем только те комнаты, которые не заняты сегодня
+    free_rooms = active_rooms.exclude(id__in=busy_rooms)
 
     if request.method == 'POST':
         try:
@@ -28,7 +43,7 @@ def room_list(request):
 
         return redirect('booking:room-list')
 
-    return render(request, 'booking/room_list.html', {'rooms': rooms})
+    return render(request, 'booking/room_list.html', {'rooms': free_rooms})
 
 
 def booking_list(request):
