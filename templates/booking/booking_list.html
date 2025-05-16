@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Бронювання{% endblock %}
+
+{% block content %}
+<h1>Список бронювань</h1>
+
+{% for booking in bookings %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ booking.user_name }}</h5>
+            <p class="card-text">
+                Кімната: <strong>{{ booking.room.name }}</strong><br>
+                З: {{ booking.start_date }} по {{ booking.end_date }}
+            </p>
+            {% if booking.is_confirmed %}
+                <span class="badge bg-success">Підтверджено</span>
+            {% else %}
+                <span class="badge bg-danger">Не підтверджено</span>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <p>Бронювань поки немає.</p>
+{% endfor %}
+{% endblock %}
