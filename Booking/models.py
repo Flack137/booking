@@ -28,10 +28,10 @@ class BookingManager(models.Manager):
         room = kwargs.get('room')
 
         if start_date >= end_date:
-            raise ValidationError("Дата окончания должна быть позже даты начала")
+            raise ValidationError("Дата закінчення має бути пізніше дати початку")
 
         if not room.is_available(start_date, end_date):
-            raise ValidationError("Комната не доступна для выбранных дат")
+            raise ValidationError("Кімната недоступна для вибраних дат")
 
         return super().create(**kwargs)
 

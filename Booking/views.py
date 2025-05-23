@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import Room, Booking
 from datetime import date
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 
 
 def index(request):
@@ -11,30 +12,30 @@ def index(request):
 
 
 def room_list(request):
-    today = date.today()
+    selected_date_str = request.GET.get('date')
+    selected_date = parse_date(selected_date_str) if selected_date_str else None
+    rooms = Room.objects.filter(is_active=True)
 
-    # Получаем комнаты, которые активны
-    active_rooms = Room.objects.filter(is_active=True)
-
-    # Фильтруем комнаты, у которых нет бронирований, пересекающихся с сегодняшним днем
-    busy_rooms = Booking.objects.filter(
-        Q(start_date__lte=today),
-        Q(end_date__gte=today),
-        is_confirmed=True
-    ).values_list('room_id', flat=True)
-
-    # Оставляем только те комнаты, которые не заняты сегодня
-    free_rooms = active_rooms.exclude(id__in=busy_rooms)
+    if selected_date:
+        booked_rooms_ids = Booking.objects.filter(
+            is_confirmed=True,
+            start_date__lte=selected_date,
+            end_date__gte=selected_date
+        ).values_list('room_id', flat=True)
+        rooms = rooms.exclude(id__in=booked_rooms_ids)
 
     if request.method == 'POST':
         try:
             room = Room.objects.get(id=request.POST['room_id'])
+            number_of_guests = int(request.POST['number_of_guests'])
+
             booking = Booking.objects.create_booking(
                 user_name=request.POST['user_name'],
                 user_email=request.POST['user_email'],
                 room=room,
                 start_date=request.POST['start_date'],
                 end_date=request.POST['end_date'],
+                number_of_guests=number_of_guests,
                 is_confirmed=True,
             )
             messages.success(request, 'Бронювання успішно створено!')
@@ -43,7 +44,10 @@ def room_list(request):
 
         return redirect('booking:room-list')
 
-    return render(request, 'booking/room_list.html', {'rooms': free_rooms})
+    return render(request, 'booking/room_list.html', {
+        'rooms': rooms,
+        'selected_date': selected_date_str
+    })
 
 
 def booking_list(request):
