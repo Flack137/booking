@@ -20,7 +20,7 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'booking:room-list' %}">Кімнати</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'booking:booking-list' %}">Бронювання</a></li>
     {% if user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Вийти</a></li>
+        <li class="nav-item"><form method="POST" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="nav-link">Вихід</button></form></li>
     {% else %}
         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Вхід</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'booking:register' %}">Реєстрація</a></li>
