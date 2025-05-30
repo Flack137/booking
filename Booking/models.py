@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+
 class Room(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -44,6 +45,7 @@ class Booking(models.Model):
     end_date = models.DateField()
     created_at = models.DateTimeField(default=timezone.now)
     is_confirmed = models.BooleanField(default=False)
+    number_of_guests = models.PositiveIntegerField(default=1)  # ← Добавлено
 
     objects = BookingManager()
 

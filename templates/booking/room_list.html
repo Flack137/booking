@@ -4,10 +4,14 @@
 {% block content %}
 <h1>Список доступних кімнат</h1>
 
-<!-- Форма вибору дати -->
+<!-- Форма вибору діапазону дат -->
 <form method="get" style="margin-bottom: 20px;">
-    <label for="date">Оберіть дату:</label>
-    <input type="date" id="date" name="date" value="{{ selected_date|default:'' }}" required>
+    <label for="start_date">Дата заїзду:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ start_date|default:'' }}" required>
+
+    <label for="end_date">Дата виїзду:</label>
+    <input type="date" id="end_date" name="end_date" value="{{ end_date|default:'' }}" required>
+
     <button type="submit">Показати доступні кімнати</button>
 </form>
 
@@ -33,16 +37,16 @@
                 <input type="number" name="number_of_guests" min="1" max="{{ room.capacity }}" required><br>
 
                 <label>Дата заїзду:</label><br>
-                <input type="date" name="start_date" required><br>
+                <input type="date" name="start_date" value="{{ start_date }}" required><br>
 
                 <label>Дата виїзду:</label><br>
-                <input type="date" name="end_date" required><br><br>
+                <input type="date" name="end_date" value="{{ end_date }}" required><br><br>
 
                 <button type="submit">Забронювати</button>
             </form>
         </div>
     {% endfor %}
 {% else %}
-    <p>Немає доступних кімнат на цю дату або кімнати не знайдені.</p>
+    <p>Немає доступних кімнат на обраний період або кімнати не знайдені.</p>
 {% endif %}
 {% endblock %}

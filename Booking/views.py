@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from .models import Room, Booking
-from datetime import date
-from django.db.models import Q
 from django.utils.dateparse import parse_date
+from datetime import date
 
 
 def index(request):
@@ -12,15 +11,23 @@ def index(request):
 
 
 def room_list(request):
-    selected_date_str = request.GET.get('date')
-    selected_date = parse_date(selected_date_str) if selected_date_str else None
-    rooms = Room.objects.filter(is_active=True)
+    # 🔥 Удаляем старые брони
+    Booking.objects.filter(end_date__lt=date.today()).delete()
 
-    if selected_date:
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    start_date = parse_date(start_date_str) if start_date_str else None
+    end_date = parse_date(end_date_str) if end_date_str else None
+
+    rooms = Room.objects.filter(is_active=True)
+    today = date.today()
+
+    if start_date and end_date:
         booked_rooms_ids = Booking.objects.filter(
             is_confirmed=True,
-            start_date__lte=selected_date,
-            end_date__gte=selected_date
+            end_date__gte=today,
+            start_date__lt=end_date,
+            end_date__gt=start_date
         ).values_list('room_id', flat=True)
         rooms = rooms.exclude(id__in=booked_rooms_ids)
 
@@ -46,7 +53,8 @@ def room_list(request):
 
     return render(request, 'booking/room_list.html', {
         'rooms': rooms,
-        'selected_date': selected_date_str
+        'start_date': start_date_str,
+        'end_date': end_date_str
     })
 
 
