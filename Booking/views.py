@@ -4,6 +4,8 @@ from django.contrib import messages
 from .models import Room, Booking
 from django.utils.dateparse import parse_date
 from datetime import date
+from django.contrib.auth import login
+from .forms import UserRegisterForm
 
 
 def index(request):
@@ -61,3 +63,18 @@ def room_list(request):
 def booking_list(request):
     bookings = Booking.objects.all().order_by('-created_at')
     return render(request, 'booking/booking_list.html', {'bookings': bookings})
+
+
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Ви успішно зареєструвались!")
+            return redirect('booking:index')
+    else:
+        form = UserRegisterForm()
+    return render(request, 'booking/register.html', {'form': form})
