@@ -6,14 +6,17 @@ from django.utils.dateparse import parse_date
 from datetime import date
 from django.contrib.auth import login
 from .forms import UserRegisterForm
-
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+import os
+from config.settings import EMAIL_HOST_USER
 
 def index(request):
     return render(request, 'booking/index.html')
 
 
 def room_list(request):
-    # 🔥 Удаляем старые брони
+    
     Booking.objects.filter(end_date__lt=date.today()).delete()
 
     start_date_str = request.GET.get('start_date')
@@ -38,16 +41,30 @@ def room_list(request):
             room = Room.objects.get(id=request.POST['room_id'])
             number_of_guests = int(request.POST['number_of_guests'])
 
+
+            user_name = request.user.username if request.user.is_authenticated else request.POST['user_name']
+            user_email = request.user.email if request.user.is_authenticated else request.POST['user_email']
+
             booking = Booking.objects.create_booking(
-                user_name=request.POST['user_name'],
-                user_email=request.POST['user_email'],
+                user_name=user_name,
+                user_email=user_email,
                 room=room,
                 start_date=request.POST['start_date'],
                 end_date=request.POST['end_date'],
                 number_of_guests=number_of_guests,
                 is_confirmed=True,
             )
-            messages.success(request, 'Бронювання успішно створено!')
+
+
+            send_mail(
+                subject='Підтвердження бронювання',
+                message=f'Дякуємо, {booking.user_name}! Ваше бронювання кімнати "{booking.room.name}" з {booking.start_date} по {booking.end_date} підтверджено.',
+                from_email=EMAIL_HOST_USER,
+                recipient_list=[booking.user_email],
+                fail_silently=False,
+            )
+
+            messages.success(request, 'Бронювання успішно створено та підтверджено!')
         except (Room.DoesNotExist, ValidationError) as e:
             messages.error(request, f'Помилка: {e}')
 
@@ -65,8 +82,6 @@ def booking_list(request):
     return render(request, 'booking/booking_list.html', {'bookings': bookings})
 
 
-
-
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -78,3 +93,8 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(request, 'booking/register.html', {'form': form})
+
+
+def booking_confirm(request):
+    if request.method == 'POST':
+        pass

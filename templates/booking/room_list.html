@@ -27,11 +27,20 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room.id }}">
+
                 <label>Ім’я:</label><br>
-                <input type="text" name="user_name" required><br>
+                {% if request.user.is_authenticated %}
+                    <input type="text" name="user_name" value="{{ request.user.username }}" readonly><br>
+                {% else %}
+                    <input type="text" name="user_name" required><br>
+                {% endif %}
 
                 <label>Email:</label><br>
-                <input type="email" name="user_email" required><br>
+                {% if request.user.is_authenticated %}
+                    <input type="email" name="user_email" value="{{ request.user.email }}" readonly><br>
+                {% else %}
+                    <input type="email" name="user_email" required><br>
+                {% endif %}
 
                 <label>Кількість гостей:</label><br>
                 <input type="number" name="number_of_guests" min="1" max="{{ room.capacity }}" required><br>
