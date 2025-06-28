@@ -2,12 +2,35 @@
 {% block title %}Доступні кімнати{% endblock %}
 
 {% block content %}
-<h1>Список доступних кімнат</h1>
+<style>
+    .btn-purple {
+        background-color: #a970ff;
+        color: #fff;
+        border: none;
+    }
+    .btn-purple:hover {
+        background-color: #944dff;
+        color: #fff;
+    }
+    .card-dark {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+    .border-purple {
+        border-color: #a970ff !important;
+    }
+    .text-purple {
+        color: #a970ff !important;
+    }
+</style>
 
-<!-- Форма вибору діапазону дат -->
-<form method="get" style="margin-bottom: 20px;">
-    <label for="start_date">Дата заїзду:</label>
-    <input type="date" id="start_date" name="start_date" value="{{ start_date|default:'' }}" required>
+<div class="container py-4 text-light">
+    <h1 class="text-center fw-bold mb-4 text-purple">Список доступних кімнат</h1>
+
 
     <label for="end_date">Дата виїзду:</label>
     <input type="date" id="end_date" name="end_date" value="{{ end_date|default:'' }}" required>
@@ -53,9 +76,71 @@
 
                 <button type="submit">Забронювати</button>
             </form>
+
+    <form method="get" class="row g-3 align-items-end border border-purple p-3 mb-4 rounded shadow-sm card-dark">
+        <div class="col-md-4">
+            <label for="start_date" class="form-label">Дата заїзду:</label>
+            <input type="date" id="start_date" name="start_date" class="form-control border-purple bg-dark text-light" value="{{ start_date|default:'' }}" required>
+
         </div>
-    {% endfor %}
-{% else %}
-    <p>Немає доступних кімнат на обраний період або кімнати не знайдені.</p>
-{% endif %}
+        <div class="col-md-4">
+            <label for="end_date" class="form-label">Дата виїзду:</label>
+            <input type="date" id="end_date" name="end_date" class="form-control border-purple bg-dark text-light" value="{{ end_date|default:'' }}" required>
+        </div>
+        <div class="col-md-4 d-grid">
+            <button type="submit" class="btn btn-purple mt-2">Показати доступні кімнати</button>
+        </div>
+    </form>
+
+    {% if rooms %}
+        {% for room in rooms %}
+            <div class="card mb-4 card-dark border-purple shadow-sm">
+                <div class="card-header bg-dark text-purple fw-semibold">
+                    <h5 class="mb-0"><i class="bi bi-door-open-fill me-2 text-purple"></i>{{ room.name }}</h5>
+                </div>
+                <div class="card-body text-light">
+                    <p class="card-text"><strong>Опис:</strong> {{ room.description }}</p>
+                    <p class="card-text"><strong>Вмістимість:</strong> {{ room.capacity }} осіб</p>
+                    <p class="card-text"><strong>Ціна за ніч:</strong> <span class="text-purple">{{ room.price_per_night }} грн</span></p>
+
+                    <form method="post" class="mt-3 border-top pt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="room_id" value="{{ room.id }}">
+
+                        <div class="mb-2">
+                            <label class="form-label">Ім’я:</label>
+                            <input type="text" name="user_name" class="form-control border-purple bg-dark text-light" value="{{ request.user.username }}" {% if request.user.is_authenticated %}readonly{% endif %} required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Email:</label>
+                            <input type="email" name="user_email" class="form-control border-purple bg-dark text-light" value="{{ request.user.email }}" {% if request.user.is_authenticated %}readonly{% endif %} required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Кількість гостей:</label>
+                            <input type="number" name="number_of_guests" class="form-control border-purple bg-dark text-light" min="1" max="{{ room.capacity }}" required>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Дата заїзду:</label>
+                            <input type="date" name="start_date" class="form-control border-purple bg-dark text-light" value="{{ start_date }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Дата виїзду:</label>
+                            <input type="date" name="end_date" class="form-control border-purple bg-dark text-light" value="{{ end_date }}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-purple w-100">Забронювати</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center fw-semibold" role="alert">
+            Немає доступних кімнат на обраний період або кімнати не знайдені.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -2,10 +2,48 @@
 {% block title %}Реєстрація{% endblock %}
 
 {% block content %}
-<h2>Реєстрація</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Зареєструватися</button>
-</form>
+<style>
+    .btn-purple {
+        background-color: #a970ff;
+        color: #fff;
+        border: none;
+    }
+    .btn-purple:hover {
+        background-color: #944dff;
+        color: #fff;
+    }
+    .card-dark {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card-dark text-light p-4 shadow rounded" style="width: 100%; max-width: 500px;">
+        <h2 class="text-center mb-4">Реєстрація</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="text-danger small mt-1 mb-0 ps-3">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-purple w-100">Зареєструватися</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

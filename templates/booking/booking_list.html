@@ -2,24 +2,58 @@
 {% block title %}Бронювання{% endblock %}
 
 {% block content %}
-<h1>Список бронювань</h1>
+<style>
+    .btn-purple {
+        background-color: #a970ff;
+        color: #fff;
+        border: none;
+    }
+    .btn-purple:hover {
+        background-color: #944dff;
+        color: #fff;
+    }
+    .card-dark {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+    .border-purple {
+        border-color: #a970ff !important;
+    }
+    .text-purple {
+        color: #a970ff !important;
+    }
+</style>
 
-{% for booking in bookings %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">{{ booking.user_name }}</h5>
-            <p class="card-text">
-                Кімната: <strong>{{ booking.room.name }}</strong><br>
-                З: {{ booking.start_date }} по {{ booking.end_date }}
-            </p>
-            {% if booking.is_confirmed %}
-                <span class="badge bg-success">Підтверджено</span>
-            {% else %}
-                <span class="badge bg-danger">Не підтверджено</span>
-            {% endif %}
+<div class="container py-4 text-light">
+    <h1 class="text-center fw-bold mb-4 text-purple">Список бронювань</h1>
+
+    {% for booking in bookings %}
+        <div class="card mb-3 card-dark border-purple text-light shadow-sm">
+            <div class="card-header bg-dark text-purple">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person-fill text-purple me-2"></i>{{ booking.user_name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text mb-2">
+                    <strong>Кімната:</strong> {{ booking.room.name }}<br>
+                    <strong>З:</strong> {{ booking.start_date }} <strong>по</strong> {{ booking.end_date }}
+                </p>
+                {% if booking.is_confirmed %}
+                    <span class="badge bg-success">Підтверджено</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Не підтверджено</span>
+                {% endif %}
+            </div>
         </div>
-    </div>
-{% empty %}
-    <p>Бронювань поки немає.</p>
-{% endfor %}
+    {% empty %}
+        <div class="alert alert-warning text-center fw-semibold" role="alert">
+            Бронювань поки немає.
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

@@ -1,49 +1,99 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}Booking{% endblock %}</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Booking{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    {% block extra_head %}{% endblock %}
+  <style>
+    body {
+      background-color: #212529; /* темно-сірий фон */
+      color: #fff;
+    }
+
+    .navbar.custom-navbar {
+      background-color: #712cf9; /* фіолетовий як у Bootstrap */
+      height: 70px; /* трохи вище */
+    }
+
+    .navbar-brand, .nav-link {
+      color: white !important;
+    }
+
+    .nav-link:hover {
+      color: #e0e0e0 !important;
+    }
+
+    .btn-custom-white {
+      background-color: white;
+      color: black;
+      border: 1px solid white;
+    }
+
+    .btn-custom-white:hover {
+      background-color: #f0f0f0;
+      border-color: #f0f0f0;
+    }
+
+    .alert {
+      color: black; /* для повідомлень */
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+<!-- Верхня навігація -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar shadow-sm mb-4">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'booking:index' %}">Booking</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto">
+    <a class="navbar-brand fw-bold" href="{% url 'booking:index' %}">
+      <i class="bi bi-calendar-check-fill me-2"></i>Booking
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="{% url 'booking:room-list' %}">Кімнати</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'booking:booking-list' %}">Бронювання</a></li>
-    {% if user.is_authenticated %}
-        <li class="nav-item"><form method="POST" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" class="nav-link">Вихід</button></form></li>
-    {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Вхід</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'booking:register' %}">Реєстрація</a></li>
-    {% endif %}
+      </ul>
+      <ul class="navbar-nav ms-auto">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <form method="POST" action="{% url 'logout' %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-custom-white btn-sm">Вихід</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Вхід</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'booking:register' %}">Реєстрація</a></li>
+        {% endif %}
       </ul>
     </div>
   </div>
 </nav>
 
+<!-- Контейнер -->
 <div class="container">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    {% endif %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
 
-    {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 </div>
 
-<!-- Bootstrap JS Bundle (Popper + JS) -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% block extra_scripts %}{% endblock %}

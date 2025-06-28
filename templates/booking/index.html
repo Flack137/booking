@@ -2,8 +2,43 @@
 {% block title %}Головна сторінка{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <h1>Ласкаво просимо до системи бронювання кімнат!</h1>
-    <p>Скористайтеся меню вище, щоб переглянути доступні кімнати або перевірити бронювання.</p>
+<style>
+    .btn-purple {
+        background-color: #a970ff;
+        color: #fff;
+        border: none;
+    }
+    .btn-purple:hover {
+        background-color: #944dff;
+        color: #fff;
+    }
+    .card-dark {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card-dark text-light p-5 rounded shadow text-center" style="max-width: 600px;">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="bi bi-fire text-purple" style="color: #a970ff;"></i>
+            <span style="color: #a970ff;">Ласкаво просимо!</span>
+        </h1>
+        <p class="lead">
+            Ви у системі бронювання кімнат. Переглядайте доступні кімнати, робіть бронювання та керуйте ними швидко й зручно.
+        </p>
+        <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'booking:room-list' %}" class="btn btn-purple btn-lg">
+                <i class="bi bi-door-open-fill me-1"></i> Доступні кімнати
+            </a>
+            <a href="{% url 'booking:booking-list' %}" class="btn btn-purple btn-lg">
+                <i class="bi bi-journal-check me-1"></i> Список бронювань
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

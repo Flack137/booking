@@ -5,18 +5,25 @@ from .models import Room, Booking
 from django.utils.dateparse import parse_date
 from datetime import date
 from django.contrib.auth import login
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
 from .forms import UserRegisterForm
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import login_required
+
 import os
 from config.settings import EMAIL_HOST_USER
+
+from config.settings import EMAIL_HOST_USER
+
+
 
 def index(request):
     return render(request, 'booking/index.html')
 
 
 def room_list(request):
-    
+
     Booking.objects.filter(end_date__lt=date.today()).delete()
 
     start_date_str = request.GET.get('start_date')
@@ -95,6 +102,27 @@ def register(request):
     return render(request, 'booking/register.html', {'form': form})
 
 
+
 def booking_confirm(request):
     if request.method == 'POST':
         pass
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(username=username, email=email)
+            if check_password(password, user.password):
+                login(request, user)
+                messages.success(request, f'Вітаємо, {user.username}!')
+                return redirect('booking:index')
+            else:
+                messages.error(request, 'Невірний пароль.')
+        except User.DoesNotExist:
+            messages.error(request, 'Користувача з такими даними не знайдено.')
+
+    return render(request, 'booking/login.html')
+
